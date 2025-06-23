@@ -2,6 +2,7 @@
 //! beacon consensus engine.
 
 use alloc::vec::Vec;
+use alloy_primitives::Bytes;
 
 /// Fields introduced in `engine_newPayloadV5` that are not present in the `ExecutionPayload` RPC
 /// object.
@@ -10,12 +11,12 @@ use alloc::vec::Vec;
 #[cfg_attr(any(test, feature = "arbitrary"), derive(arbitrary::Arbitrary))]
 pub struct AmsterdamPayloadFields {
     /// The Inclusion List (IL) for Amsterdam.
-    pub il: Vec<Vec<u8>>,
+    pub il: Vec<Bytes>,
 }
 
 impl AmsterdamPayloadFields {
     /// Returns a new [`AmsterdamPayloadFields`] instance.
-    pub fn new(il: Vec<Vec<u8>>) -> Self {
+    pub fn new(il: Vec<Bytes>) -> Self {
         Self { il }
     }
 }
@@ -45,7 +46,7 @@ impl MaybeAmsterdamPayloadFields {
     }
 
     /// Returns the Inclusion List (IL), if any.
-    pub fn il(&self) -> Option<&Vec<Vec<u8>>> {
+    pub fn il(&self) -> Option<&Vec<Bytes>> {
         self.fields.as_ref().map(|fields| &fields.il)
     }
 

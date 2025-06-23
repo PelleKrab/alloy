@@ -7,7 +7,7 @@ use crate::{
 use alloc::vec::Vec;
 use alloy_consensus::{Block, BlockHeader, Transaction};
 use alloy_eips::eip7685::Requests;
-use alloy_primitives::B256;
+use alloy_primitives::{Bytes, B256};
 
 /// Container type for all available additional `newPayload` request parameters that are not present
 /// in the `ExecutionPayload` object itself.
@@ -142,7 +142,7 @@ impl ExecutionPayloadSidecar {
     }
 
     /// Returns the Inclusion List (IL) for Amsterdam, if any.
-    pub fn il(&self) -> Option<&Vec<Vec<u8>>> {
+    pub fn il(&self) -> Option<&Vec<Bytes>> {
         self.amsterdam.il()
     }
 
