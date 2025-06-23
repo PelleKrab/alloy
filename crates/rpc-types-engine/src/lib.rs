@@ -14,6 +14,8 @@ mod cancun;
 pub use cancun::*;
 mod prague;
 pub use prague::*;
+mod amsterdam;
+pub use amsterdam::*;
 mod sidecar;
 pub use sidecar::*;
 
@@ -45,7 +47,7 @@ pub use alloy_eips::eip4844::BlobAndProofV1;
 
 /// The list of all supported Engine capabilities available over the engine endpoint.
 ///
-/// Latest spec: Prague
+/// Latest spec: Amsterdam
 pub const CAPABILITIES: &[&str] = &[
     "engine_forkchoiceUpdatedV1",
     "engine_forkchoiceUpdatedV2",
@@ -60,6 +62,7 @@ pub const CAPABILITIES: &[&str] = &[
     "engine_newPayloadV2",
     "engine_newPayloadV3",
     "engine_newPayloadV4",
+    "engine_newPayloadV5",
     "engine_getPayloadBodiesByHashV1",
     "engine_getPayloadBodiesByRangeV1",
 ];
