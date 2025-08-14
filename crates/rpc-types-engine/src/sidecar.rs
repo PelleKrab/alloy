@@ -1,7 +1,7 @@
 //! Contains helpers for dealing with additional parameters of `newPayload` requests.
 
 use crate::{
-    amsterdam, AmsterdamPayloadFields, CancunPayloadFields, MaybeAmsterdamPayloadFields,
+    AmsterdamPayloadFields, CancunPayloadFields, MaybeAmsterdamPayloadFields,
     MaybeCancunPayloadFields, MaybePraguePayloadFields, PraguePayloadFields,
 };
 use alloc::vec::Vec;
@@ -48,7 +48,6 @@ impl ExecutionPayloadSidecar {
         let prague = block.requests_hash().map(PraguePayloadFields::new);
 
         // Amsterdam fields are not extracted from the block, so always use none here.
-        let amsterdam = MaybeAmsterdamPayloadFields::none();
 
         match (cancun, prague) {
             (Some(cancun), Some(prague)) => Self::v4(cancun, prague),
