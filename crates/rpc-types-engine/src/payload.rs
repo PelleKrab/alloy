@@ -21,6 +21,7 @@ use alloy_eips::{
     BlockNumHash,
 };
 use alloy_primitives::{bytes::BufMut, Address, Bloom, Bytes, Sealable, B256, B64, U256};
+
 use core::iter::{FromIterator, IntoIterator};
 
 /// The execution payload body response that allows for `null` values.

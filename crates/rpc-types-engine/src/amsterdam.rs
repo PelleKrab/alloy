@@ -1,5 +1,5 @@
-//! Contains types related to the Amsterdam hardfork that will be used by RPC to communicate with the
-//! beacon consensus engine.
+//! Contains types related to the Amsterdam hardfork that will be used by RPC to communicate with
+//! the beacon consensus engine.
 
 use alloc::vec::Vec;
 use alloy_primitives::Bytes;
