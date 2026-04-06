@@ -2756,6 +2756,9 @@ pub struct PayloadAttributes {
     /// See also <https://github.com/ethereum/execution-apis/blob/main/src/engine/cancun.md#payloadattributesv3>
     #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
     pub parent_beacon_block_root: Option<B256>,
+    /// Inclusion list of the new payload enabled with V4.
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    pub inclusion_list_transactions: Option<Vec<Bytes>>,
 }
 
 /// This structure contains the result of processing a payload or fork choice update.
@@ -2869,6 +2872,10 @@ pub enum PayloadStatusEnum {
     /// ACCEPTED is returned by the engine API in the following calls:
     ///   - newPayload: if the payload was accepted, but not processed (side chain)
     Accepted,
+
+    /// INCLUSION_LIST_UNSATISFIED is returned when the engine could not satisfy a provided
+    /// inclusion list for a payload build.
+    InclusionListUnsatisfied,
 }
 
 impl PayloadStatusEnum {
@@ -2879,6 +2886,7 @@ impl PayloadStatusEnum {
             Self::Invalid { .. } => "INVALID",
             Self::Syncing => "SYNCING",
             Self::Accepted => "ACCEPTED",
+            Self::InclusionListUnsatisfied => "INCLUSION_LIST_UNSATISFIED",
         }
     }
 

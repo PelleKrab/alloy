@@ -13,4 +13,6 @@ pub enum ForkchoiceUpdateVersion {
     V3 = 3,
     /// Version 4 of the engine api.
     V4 = 4,
+    /// Version 5 of the engine api.
+    V5 = 5,
 }
