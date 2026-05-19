@@ -10,6 +10,10 @@
 #[macro_use]
 extern crate alloc;
 
+mod amsterdam;
+pub use amsterdam::*;
+mod hegota;
+pub use hegota::*;
 mod cancun;
 pub use cancun::*;
 mod prague;
@@ -52,11 +56,12 @@ pub use alloy_eips::eip4844::BlobCellsAndProofsV1;
 
 /// The list of all supported Engine capabilities available over the engine endpoint.
 ///
-/// Latest spec: Prague
+/// Latest spec: Hegota
 pub const CAPABILITIES: &[&str] = &[
     "engine_forkchoiceUpdatedV1",
     "engine_forkchoiceUpdatedV2",
     "engine_forkchoiceUpdatedV3",
+    "engine_forkchoiceUpdatedV5",
     "engine_exchangeTransitionConfigurationV1",
     "engine_getClientVersionV1",
     "engine_getPayloadV1",
@@ -68,8 +73,13 @@ pub const CAPABILITIES: &[&str] = &[
     "engine_newPayloadV2",
     "engine_newPayloadV3",
     "engine_newPayloadV4",
+    "engine_newPayloadV6",
     "engine_getPayloadBodiesByHashV1",
     "engine_getPayloadBodiesByRangeV1",
     "engine_getPayloadBodiesByHashV2",
     "engine_getPayloadBodiesByRangeV2",
+    "engine_getBlobsV1",
+    "engine_getBlobsV2",
+    "engine_getBlobsV3",
+    "engine_getInclusionListV1",
 ];

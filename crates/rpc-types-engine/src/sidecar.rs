@@ -1,12 +1,13 @@
 //! Contains helpers for dealing with additional parameters of `newPayload` requests.
 
 use crate::{
-    CancunPayloadFields, MaybeCancunPayloadFields, MaybePraguePayloadFields, PraguePayloadFields,
+    CancunPayloadFields, HegotaPayloadFields, MaybeCancunPayloadFields, MaybeHegotaPayloadFields,
+    MaybePraguePayloadFields, PraguePayloadFields,
 };
 use alloc::vec::Vec;
 use alloy_consensus::{Block, BlockHeader, Transaction};
 use alloy_eips::eip7685::Requests;
-use alloy_primitives::B256;
+use alloy_primitives::{Bytes, B256};
 
 /// Container type for all available additional `newPayload` request parameters that are not present
 /// in the `ExecutionPayload` object itself.
@@ -20,6 +21,9 @@ pub struct ExecutionPayloadSidecar {
     /// The EIP-7685 requests provided as additional request params to `engine_newPayloadV4` that
     /// are not present in the `ExecutionPayload`.
     prague: MaybePraguePayloadFields,
+    /// Hegota (Bogota / EIP-7805) request params introduced in `engine_newPayloadV6` that are not
+    /// present in the `ExecutionPayload`.
+    hegota: MaybeHegotaPayloadFields,
 }
 
 impl ExecutionPayloadSidecar {
@@ -43,6 +47,8 @@ impl ExecutionPayloadSidecar {
 
         let prague = block.requests_hash().map(PraguePayloadFields::new);
 
+        // Hegota fields are not extracted from the block, so always use none here.
+
         match (cancun, prague) {
             (Some(cancun), Some(prague)) => Self::v4(cancun, prague),
             (Some(cancun), None) => Self::v3(cancun),
@@ -52,17 +58,30 @@ impl ExecutionPayloadSidecar {
 
     /// Returns a new empty instance (pre-cancun, v1, v2)
     pub const fn none() -> Self {
-        Self { cancun: MaybeCancunPayloadFields::none(), prague: MaybePraguePayloadFields::none() }
+        Self {
+            cancun: MaybeCancunPayloadFields::none(),
+            prague: MaybePraguePayloadFields::none(),
+            hegota: MaybeHegotaPayloadFields::none(),
+        }
     }
 
     /// Creates a new instance for cancun with the cancun fields for `engine_newPayloadV3`
     pub fn v3(cancun: CancunPayloadFields) -> Self {
-        Self { cancun: cancun.into(), prague: MaybePraguePayloadFields::none() }
+        Self {
+            cancun: cancun.into(),
+            prague: MaybePraguePayloadFields::none(),
+            hegota: MaybeHegotaPayloadFields::none(),
+        }
     }
 
     /// Creates a new instance post prague for `engine_newPayloadV4`
     pub fn v4(cancun: CancunPayloadFields, prague: PraguePayloadFields) -> Self {
-        Self { cancun: cancun.into(), prague: prague.into() }
+        Self { cancun: cancun.into(), prague: prague.into(), hegota: MaybeHegotaPayloadFields::none() }
+    }
+
+    /// Creates a new instance for Hegota (Bogota / EIP-7805) for `engine_newPayloadV6`
+    pub fn v7(cancun: CancunPayloadFields, prague: PraguePayloadFields, hegota: HegotaPayloadFields) -> Self {
+        Self { cancun: cancun.into(), prague: prague.into(), hegota: hegota.into() }
     }
 
     /// Returns a reference to the [`CancunPayloadFields`].
@@ -83,6 +102,16 @@ impl ExecutionPayloadSidecar {
     /// Consumes the type and returns the [`PraguePayloadFields`].
     pub fn into_prague(self) -> Option<PraguePayloadFields> {
         self.prague.into_inner()
+    }
+
+    /// Returns a reference to the [`HegotaPayloadFields`].
+    pub const fn hegota(&self) -> Option<&HegotaPayloadFields> {
+        self.hegota.as_ref()
+    }
+
+    /// Consumes the type and returns the [`HegotaPayloadFields`].
+    pub fn into_hegota(self) -> Option<HegotaPayloadFields> {
+        self.hegota.into_inner()
     }
 
     /// Returns the parent beacon block root, if any.
@@ -110,5 +139,10 @@ impl ExecutionPayloadSidecar {
     /// - If it contains a precomputed hash (used for testing), it returns that hash directly.
     pub fn requests_hash(&self) -> Option<B256> {
         self.prague.requests_hash()
+    }
+
+    /// Returns the Inclusion List (IL) transactions for Hegota (EIP-7805), if any.
+    pub fn inclusion_list_transactions(&self) -> Option<&Vec<Bytes>> {
+        self.hegota.inclusion_list_transactions()
     }
 }

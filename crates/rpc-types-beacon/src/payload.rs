@@ -159,6 +159,8 @@ struct BeaconPayloadAttributes {
     parent_beacon_block_root: Option<B256>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub slot_number: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    inclusion_list_transactions: Option<Vec<Bytes>>,
 }
 
 /// A helper module for serializing and deserializing the payload attributes for the beacon API.
@@ -186,6 +188,7 @@ pub mod beacon_api_payload_attributes {
             withdrawals: payload_attributes.withdrawals.clone(),
             parent_beacon_block_root: payload_attributes.parent_beacon_block_root,
             slot_number: payload_attributes.slot_number,
+            inclusion_list_transactions: payload_attributes.inclusion_list_transactions.clone(),
         };
         beacon_api_payload_attributes.serialize(serializer)
     }
@@ -203,6 +206,7 @@ pub mod beacon_api_payload_attributes {
             withdrawals: beacon_api_payload_attributes.withdrawals,
             parent_beacon_block_root: beacon_api_payload_attributes.parent_beacon_block_root,
             slot_number: beacon_api_payload_attributes.slot_number,
+            inclusion_list_transactions: beacon_api_payload_attributes.inclusion_list_transactions,
         })
     }
 }

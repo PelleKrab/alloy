@@ -3305,6 +3305,9 @@ pub struct PayloadAttributes {
         )
     )]
     pub slot_number: Option<u64>,
+    /// Inclusion list of the new payload enabled with Hegota (FOCIL).
+    #[cfg_attr(feature = "serde", serde(skip_serializing_if = "Option::is_none"))]
+    pub inclusion_list_transactions: Option<Vec<Bytes>>,
 }
 
 impl PayloadAttributes {
@@ -3432,6 +3435,7 @@ impl ssz::Decode for PayloadAttributes {
                 withdrawals: None,
                 parent_beacon_block_root: None,
                 slot_number: None,
+                inclusion_list_transactions: None,
             });
         }
 
@@ -3467,6 +3471,7 @@ impl ssz::Decode for PayloadAttributes {
                     withdrawals: Some(decoder.decode_next()?),
                     parent_beacon_block_root: None,
                     slot_number: None,
+                    inclusion_list_transactions: None,
                 })
             }
             offset if offset == Self::ssz_v3_fixed_len() => {
@@ -3480,6 +3485,7 @@ impl ssz::Decode for PayloadAttributes {
                     withdrawals: Some(decoder.decode_next()?),
                     parent_beacon_block_root: Some(decoder.decode_next()?),
                     slot_number: None,
+                    inclusion_list_transactions: None,
                 })
             }
             offset if offset == Self::ssz_v4_fixed_len() => {
@@ -3494,6 +3500,7 @@ impl ssz::Decode for PayloadAttributes {
                     withdrawals: Some(decoder.decode_next()?),
                     parent_beacon_block_root: Some(decoder.decode_next()?),
                     slot_number: Some(decoder.decode_next()?),
+                    inclusion_list_transactions: None,
                 })
             }
             offset => Err(ssz::DecodeError::BytesInvalid(format!(
@@ -3670,6 +3677,10 @@ pub enum PayloadStatusEnum {
     /// ACCEPTED is returned by the engine API in the following calls:
     ///   - newPayload: if the payload was accepted, but not processed (side chain)
     Accepted,
+
+    /// INCLUSION_LIST_UNSATISFIED is returned when the engine could not satisfy a provided
+    /// inclusion list for a payload build.
+    InclusionListUnsatisfied,
 }
 
 impl PayloadStatusEnum {
@@ -3680,6 +3691,7 @@ impl PayloadStatusEnum {
             Self::Invalid { .. } => "INVALID",
             Self::Syncing => "SYNCING",
             Self::Accepted => "ACCEPTED",
+            Self::InclusionListUnsatisfied => "INCLUSION_LIST_UNSATISFIED",
         }
     }
 
@@ -3713,6 +3725,7 @@ impl PayloadStatusEnum {
             Self::Invalid { .. } => 1,
             Self::Syncing => 2,
             Self::Accepted => 3,
+            Self::InclusionListUnsatisfied => 4,
         }
     }
 
@@ -3745,6 +3758,15 @@ impl PayloadStatusEnum {
                     ));
                 }
                 Ok(Self::Accepted)
+            }
+            4 => {
+                if !validation_error.is_empty() {
+                    return Err(ssz::DecodeError::BytesInvalid(
+                        "unexpected validation error for INCLUSION_LIST_UNSATISFIED status"
+                            .to_string(),
+                    ));
+                }
+                Ok(Self::InclusionListUnsatisfied)
             }
             _ => Err(ssz::DecodeError::BytesInvalid("unknown payload status code".to_string())),
         }
